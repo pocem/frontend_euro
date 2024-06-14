@@ -8,13 +8,13 @@ console.log(__filename)
 const __dirname = dirname(__filename);
 console.log(__dirname)
 const app = express();
-const staticPath = path.join(__dirname, 'dist');
+// const staticPath = path.join(__dirname, 'dist');
 console.log(staticPath)
 app.use(express.static(staticPath));
 
 app.get('*', (req, res) => {
-  console.log("som tu", path.join(staticPath, 'index.html'))
-  res.sendFile(path.join(staticPath, 'index.html'));
+  console.log("som tu", path.join(__dirname, 'index.html'))
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
