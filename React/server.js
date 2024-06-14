@@ -8,7 +8,7 @@ console.log(__filename)
 const __dirname = dirname(__filename);
 console.log(__dirname)
 const app = express();
-// const staticPath = path.join(__dirname, 'dist');
+const staticPath = __dirname;
 console.log(staticPath)
 app.use(express.static(staticPath));
 
