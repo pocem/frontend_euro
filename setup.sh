@@ -1,7 +1,7 @@
 export NODE_OPTIONS=--max_old_space_size=4096
 
 # Navigate to the frontend directory
-cd /Frontend/React
+cd /React
 
 
 # Install npm dependencies for frontend
