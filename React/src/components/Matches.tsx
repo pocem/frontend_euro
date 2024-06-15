@@ -108,7 +108,7 @@ const Matches: React.FC = () => {
       awayScores: {},
       submitted: false,
     };
-    newScores[currentDay].homeScores[matchId] = parseInt(score);
+    newScores[currentDay].homeScores[matchId] = parseInt(score, 10);
     setAllScores(newScores);
   };
 
@@ -119,7 +119,7 @@ const Matches: React.FC = () => {
       awayScores: {},
       submitted: false,
     };
-    newScores[currentDay].awayScores[matchId] = parseInt(score);
+    newScores[currentDay].awayScores[matchId] = parseInt(score, 10);
     setAllScores(newScores);
   };
 
@@ -267,12 +267,13 @@ const Matches: React.FC = () => {
               <MatchRow
                 key={match.match_Id}
                 match={match}
+                match_id={match.match_Id}
                 homeScore={currentScores.homeScores[match.match_Id]}
                 awayScore={currentScores.awayScores[match.match_Id]}
-                onHomeScoreChange={(score) =>
+                onHomeScoreChange={(match_id: number, score: string) =>
                   handleHomeScoreChange(match.match_Id, score)
                 }
-                onAwayScoreChange={(score) =>
+                onAwayScoreChange={(match_id: number, score: string) =>
                   handleAwayScoreChange(match.match_Id, score)
                 }
                 hasStarted={new Date() >= matchDateTime}

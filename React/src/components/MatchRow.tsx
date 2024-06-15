@@ -5,19 +5,22 @@ interface Match {
   awayTeam: string;
   date: string;
   time: string;
+  match_Id: number; // Ensure match_Id is included
 }
 
 interface MatchRowProps {
   match: Match;
+  match_id: number; // Include match_id in props
   homeScore: number;
   awayScore: number;
-  onHomeScoreChange: (score: string) => void;
-  onAwayScoreChange: (score: string) => void;
+  onHomeScoreChange: (match_id: number, score: string) => void; // Include match_id in callback
+  onAwayScoreChange: (match_id: number, score: string) => void; // Include match_id in callback
   hasStarted: boolean;
 }
 
 const MatchRow: React.FC<MatchRowProps> = ({
   match,
+  match_id, // Destructure match_id from props
   homeScore,
   awayScore,
   onHomeScoreChange,
@@ -41,8 +44,9 @@ const MatchRow: React.FC<MatchRowProps> = ({
             type="text"
             className="form-control score-input"
             value={homeScore !== undefined ? homeScore.toString() : ""}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              onHomeScoreChange(e.target.value)
+            onChange={
+              (e: ChangeEvent<HTMLInputElement>) =>
+                onHomeScoreChange(match_id, e.target.value) // Pass match_id to callback
             }
           />
         )}
@@ -56,8 +60,9 @@ const MatchRow: React.FC<MatchRowProps> = ({
             type="text"
             className="form-control score-input"
             value={awayScore !== undefined ? awayScore.toString() : ""}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              onAwayScoreChange(e.target.value)
+            onChange={
+              (e: ChangeEvent<HTMLInputElement>) =>
+                onAwayScoreChange(match_id, e.target.value) // Pass match_id to callback
             }
           />
         )}
