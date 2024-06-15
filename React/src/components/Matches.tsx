@@ -134,28 +134,49 @@ const Matches: React.FC = () => {
     let atLeastOneScoreFilled = false;
 
     // Prepare formData for submission
-    const formData = filteredMatches.map((match) => {
-      const matchId = match.match_Id;
-      const homeScore = currentScores.homeScores[matchId];
-      const awayScore = currentScores.awayScores[matchId];
+    const formData = filteredMatches
+      .map((match) => {
+        // Find the match in the original matchesData to get its index
+        const matchIndex = metaData.matchesData.findIndex(
+          (data) => data[0] === match.homeTeam && data[1] === match.awayTeam
+        );
 
-      // Check if at least one score is filled out
-      if (
-        homeScore !== undefined &&
-        awayScore !== undefined &&
-        !isNaN(homeScore) &&
-        !isNaN(awayScore)
-      ) {
-        atLeastOneScoreFilled = true;
-      }
+        // If matchIndex is -1, handle appropriately (not found in matchesData)
+        if (matchIndex === -1) {
+          console.error(
+            `Match not found in matchesData: ${match.homeTeam} vs ${match.awayTeam}`
+          );
+          return null;
+        }
 
-      // Submit scores that are filled out
-      return {
-        match_id: match.match_Id,
-        homeScore,
-        awayScore,
-      };
-    });
+        // Calculate match position (index + 1 since indices are zero-based)
+        const matchPosition = matchIndex + 1;
+
+        // Determine the match_id directly
+        const matchId = matchPosition;
+
+        const homeScore = currentScores.homeScores[matchId];
+        const awayScore = currentScores.awayScores[matchId];
+
+        // Check if at least one score is filled out
+        if (
+          homeScore !== undefined &&
+          awayScore !== undefined &&
+          !isNaN(homeScore) &&
+          !isNaN(awayScore)
+        ) {
+          atLeastOneScoreFilled = true;
+        }
+
+        // Submit scores that are filled out, include match position
+        return {
+          match_position: matchPosition, // Include the original match position
+          match_id: matchId,
+          homeScore,
+          awayScore,
+        };
+      })
+      .filter((formDataEntry) => formDataEntry !== null); // Filter out any null entries
 
     // If no scores are filled out, show error message and return
     if (!atLeastOneScoreFilled) {
@@ -183,7 +204,6 @@ const Matches: React.FC = () => {
         throw new Error("Network response was not ok");
       }
 
-      // Update allScores to mark the current day as submitted
       const newScores = { ...allScores };
       newScores[currentDay] = { ...currentScores, submitted: true };
       setAllScores(newScores);
