@@ -129,54 +129,41 @@ const Matches: React.FC = () => {
       awayScores: {},
       submitted: false,
     };
-    const submittedMatchIds: number[] = [];
 
-    let validScores = true;
+    // Flag to check if at least one score is filled out
+    let atLeastOneScoreFilled = false;
 
-    // Iterate through filtered matches and check if scores are valid
-    filteredMatches.forEach((match) => {
+    // Prepare formData for submission
+    const formData = filteredMatches.map((match) => {
       const matchId = match.match_Id;
       const homeScore = currentScores.homeScores[matchId];
       const awayScore = currentScores.awayScores[matchId];
 
-      // Check if scores are missing or invalid
+      // Check if at least one score is filled out
       if (
-        homeScore === undefined ||
-        awayScore === undefined ||
-        isNaN(homeScore) ||
-        isNaN(awayScore)
+        homeScore !== undefined &&
+        awayScore !== undefined &&
+        !isNaN(homeScore) &&
+        !isNaN(awayScore)
       ) {
-        validScores = false;
+        atLeastOneScoreFilled = true;
       }
+
+      // Submit scores that are filled out
+      return {
+        match_id: matchId,
+        homeScore,
+        awayScore,
+      };
     });
 
-    // If any score is missing or invalid, show an error message and return
-    if (!validScores) {
-      setUnsuccessfulMessage("Please provide valid scores for all matches.");
+    // If no scores are filled out, show error message and return
+    if (!atLeastOneScoreFilled) {
+      setUnsuccessfulMessage(
+        "Please provide valid scores for at least one match."
+      );
       return;
     }
-
-    // Prepare formData for submission
-    const formData = filteredMatches
-      .map((match) => {
-        const matchId = match.match_Id;
-
-        // Only submit scores that haven't been submitted before
-        if (!submittedMatchIds.includes(matchId)) {
-          submittedMatchIds.push(matchId);
-          const homeScore = currentScores.homeScores[matchId];
-          const awayScore = currentScores.awayScores[matchId];
-
-          return {
-            match_id: matchId,
-            homeScore,
-            awayScore,
-          };
-        } else {
-          return null;
-        }
-      })
-      .filter((formData) => formData !== null);
 
     try {
       const response = await fetch(
