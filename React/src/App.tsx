@@ -11,7 +11,7 @@ import Navbar from "./components/Navbar.tsx";
 import LoggedUser from "./components/LoggedUser.tsx";
 import HomePage from "./components/HomePage.tsx";
 import useWindowSize from "./components/WindowSize";
-import eurologo from "./images/eurologo.png";
+import eurologo from "./images/eurologo.jpg";
 
 function App() {
   const [showSignUpForm, setShowSignUpForm] = useState(false);
