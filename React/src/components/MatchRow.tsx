@@ -1,7 +1,6 @@
 import React, { ChangeEvent } from "react";
 
 interface Match {
-  match_id: number;
   homeTeam: string;
   awayTeam: string;
   date: string;

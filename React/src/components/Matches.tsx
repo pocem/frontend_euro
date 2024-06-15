@@ -1,23 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import metaData from "../../matchdata.json";
 import Button from "./Button";
 import MatchRow from "./MatchRow";
 import "../App.css";
 
-// Define Match type as an object with match_id
 type Match = {
-  match_id: number;
   homeTeam: string;
   awayTeam: string;
   date: string;
   time: string;
+  match_Id: number; // Ensure consistency with your data structure
 };
-
-interface DayScores {
-  homeScores: { [matchId: number]: number };
-  awayScores: { [matchId: number]: number };
-  submitted: boolean;
-}
 
 const Matches: React.FC = () => {
   const [currentDay, setCurrentDay] = useState(0);
@@ -25,19 +18,23 @@ const Matches: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [unsuccessfulMessage, setUnsuccessfulMessage] = useState("");
 
-  // Transform matches data to the correct Match type with match_id
+  interface DayScores {
+    homeScores: { [match_Id: number]: number };
+    awayScores: { [match_Id: number]: number };
+    submitted: boolean;
+  }
+
   const matches: Match[] = metaData.matchesData.map(
-    ([homeTeam, awayTeam, date, time], index) => ({
-      match_id: index + 1, // Assign a unique ID
-      homeTeam,
-      awayTeam,
-      date,
-      time,
+    ([homeTeam, awayTeam, date, time, matchId]) => ({
+      homeTeam: String(homeTeam),
+      awayTeam: String(awayTeam),
+      date: String(date),
+      time: String(time),
+      match_Id: Number(matchId), // Assuming matchId needs to be a number, cast accordingly
     })
   );
 
-  // Filter matches based on the current day
-  const filteredMatches: Match[] = matches.filter((match: Match) => {
+  const filteredMatches: Match[] = matches.filter((match) => {
     const matchDay = parseInt(match.date.split(" ")[0]);
     return matchDay === currentDay + 14;
   });
@@ -62,20 +59,19 @@ const Matches: React.FC = () => {
         }
 
         const data = await response.json();
-        console.log("fetched saved predictions:", data);
 
         const newAllScores: { [day: number]: DayScores } = {};
 
         data.forEach(
           (prediction: {
-            match_id: number;
+            match_Id: number;
             home_score: number;
             away_score: number;
           }) => {
-            const { match_id, home_score, away_score } = prediction;
+            const { match_Id, home_score, away_score } = prediction;
 
             const matchIndex = matches.findIndex(
-              (match) => match.match_id === match_id
+              (match) => match.match_Id === match_Id
             );
 
             if (matchIndex !== -1) {
@@ -88,8 +84,8 @@ const Matches: React.FC = () => {
                 submitted: false,
               };
 
-              newAllScores[dayIndex].homeScores[match_id] = home_score;
-              newAllScores[dayIndex].awayScores[match_id] = away_score;
+              newAllScores[dayIndex].homeScores[match_Id] = home_score;
+              newAllScores[dayIndex].awayScores[match_Id] = away_score;
             }
           }
         );
@@ -98,11 +94,12 @@ const Matches: React.FC = () => {
         console.log("all scores data:", newAllScores);
       } catch (error) {
         console.error("Error:", error);
+        setUnsuccessfulMessage("Failed to fetch saved predictions.");
       }
     };
 
     fetchSavedPredictions();
-  }, [matches]);
+  }, []);
 
   const handleHomeScoreChange = (matchId: number, score: string) => {
     const newScores = { ...allScores };
@@ -113,7 +110,6 @@ const Matches: React.FC = () => {
     };
     newScores[currentDay].homeScores[matchId] = parseInt(score);
     setAllScores(newScores);
-    console.log("handle homescorechange data newScores:", newScores);
   };
 
   const handleAwayScoreChange = (matchId: number, score: string) => {
@@ -125,7 +121,6 @@ const Matches: React.FC = () => {
     };
     newScores[currentDay].awayScores[matchId] = parseInt(score);
     setAllScores(newScores);
-    console.log("handle homescorechange data newScores:", newScores);
   };
 
   const handleSubmit = async () => {
@@ -136,10 +131,9 @@ const Matches: React.FC = () => {
     };
     const submittedMatchIds: number[] = [];
 
-    // Validate that all scores are provided and are valid numbers
     let validScores = true;
     filteredMatches.forEach((match) => {
-      const matchId = match.match_id;
+      const matchId = match.match_Id;
       const homeScore = currentScores.homeScores[matchId];
       const awayScore = currentScores.awayScores[matchId];
 
@@ -160,7 +154,7 @@ const Matches: React.FC = () => {
 
     const formData = filteredMatches
       .map((match) => {
-        const matchId = match.match_id;
+        const matchId = match.match_Id;
 
         if (!submittedMatchIds.includes(matchId)) {
           submittedMatchIds.push(matchId);
@@ -195,12 +189,14 @@ const Matches: React.FC = () => {
         setUnsuccessfulMessage("Predictions were not saved.");
         throw new Error("Network response was not ok");
       }
+
       const newScores = { ...allScores };
       newScores[currentDay] = { ...currentScores, submitted: true };
       setAllScores(newScores);
       setSuccessMessage("Predictions saved.");
     } catch (error) {
       console.error("Error:", error);
+      setUnsuccessfulMessage("Failed to save predictions.");
     }
   };
 
@@ -255,15 +251,15 @@ const Matches: React.FC = () => {
 
             return (
               <MatchRow
-                key={match.match_id}
+                key={match.match_Id}
                 match={match}
-                homeScore={currentScores.homeScores[match.match_id]}
-                awayScore={currentScores.awayScores[match.match_id]}
+                homeScore={currentScores.homeScores[match.match_Id]}
+                awayScore={currentScores.awayScores[match.match_Id]}
                 onHomeScoreChange={(score) =>
-                  handleHomeScoreChange(match.match_id, score)
+                  handleHomeScoreChange(match.match_Id, score)
                 }
                 onAwayScoreChange={(score) =>
-                  handleAwayScoreChange(match.match_id, score)
+                  handleAwayScoreChange(match.match_Id, score)
                 }
                 hasStarted={new Date() >= matchDateTime}
               />
