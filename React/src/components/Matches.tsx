@@ -130,18 +130,14 @@ const Matches: React.FC = () => {
       submitted: false,
     };
 
-    // Flag to check if at least one score is filled out
     let atLeastOneScoreFilled = false;
 
-    // Prepare formData for submission
     const formData = filteredMatches
       .map((match) => {
-        // Find the match in the original matchesData to get its index
         const matchIndex = metaData.matchesData.findIndex(
           (data) => data[0] === match.homeTeam && data[1] === match.awayTeam
         );
 
-        // If matchIndex is -1, handle appropriately (not found in matchesData)
         if (matchIndex === -1) {
           console.error(
             `Match not found in matchesData: ${match.homeTeam} vs ${match.awayTeam}`
@@ -149,36 +145,24 @@ const Matches: React.FC = () => {
           return null;
         }
 
-        // Calculate match position (index + 1 since indices are zero-based)
         const matchPosition = matchIndex + 1;
-
-        // Determine the match_id directly
         const matchId = matchPosition;
-
         const homeScore = currentScores.homeScores[matchId];
         const awayScore = currentScores.awayScores[matchId];
 
-        // Check if at least one score is filled out
-        if (
-          homeScore !== undefined &&
-          awayScore !== undefined &&
-          !isNaN(homeScore) &&
-          !isNaN(awayScore)
-        ) {
+        if (!isNaN(homeScore) && !isNaN(awayScore)) {
           atLeastOneScoreFilled = true;
         }
 
-        // Submit scores that are filled out, include match position
         return {
-          match_position: matchPosition, // Include the original match position
+          match_position: matchPosition,
           match_id: matchId,
           homeScore,
           awayScore,
         };
       })
-      .filter((formDataEntry) => formDataEntry !== null); // Filter out any null entries
+      .filter((formDataEntry) => formDataEntry !== null);
 
-    // If no scores are filled out, show error message and return
     if (!atLeastOneScoreFilled) {
       setUnsuccessfulMessage(
         "Please provide valid scores for at least one match."
@@ -211,6 +195,7 @@ const Matches: React.FC = () => {
       setSuccessMessage("Predictions saved.");
     } catch (error) {
       console.error("Error:", error);
+      setUnsuccessfulMessage("Failed to save predictions.");
     }
   };
 
