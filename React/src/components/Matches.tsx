@@ -132,11 +132,14 @@ const Matches: React.FC = () => {
     const submittedMatchIds: number[] = [];
 
     let validScores = true;
+
+    // Iterate through filtered matches and check if scores are valid
     filteredMatches.forEach((match) => {
       const matchId = match.match_Id;
       const homeScore = currentScores.homeScores[matchId];
       const awayScore = currentScores.awayScores[matchId];
 
+      // Check if scores are missing or invalid
       if (
         homeScore === undefined ||
         awayScore === undefined ||
@@ -147,15 +150,18 @@ const Matches: React.FC = () => {
       }
     });
 
+    // If any score is missing or invalid, show an error message and return
     if (!validScores) {
       setUnsuccessfulMessage("Please provide valid scores for all matches.");
       return;
     }
 
+    // Prepare formData for submission
     const formData = filteredMatches
       .map((match) => {
         const matchId = match.match_Id;
 
+        // Only submit scores that haven't been submitted before
         if (!submittedMatchIds.includes(matchId)) {
           submittedMatchIds.push(matchId);
           const homeScore = currentScores.homeScores[matchId];
@@ -190,13 +196,14 @@ const Matches: React.FC = () => {
         throw new Error("Network response was not ok");
       }
 
+      // Update allScores to mark the current day as submitted
       const newScores = { ...allScores };
       newScores[currentDay] = { ...currentScores, submitted: true };
       setAllScores(newScores);
+
       setSuccessMessage("Predictions saved.");
     } catch (error) {
       console.error("Error:", error);
-      setUnsuccessfulMessage("Failed to save predictions.");
     }
   };
 
