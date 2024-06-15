@@ -132,8 +132,10 @@ const Matches: React.FC = () => {
 
     let atLeastOneScoreFilled = false;
 
+    // Prepare formData for submission
     const formData = filteredMatches
       .map((match) => {
+        // Find the match in the original matchesData to get its index
         const matchIndex = metaData.matchesData.findIndex(
           (data) => data[0] === match.homeTeam && data[1] === match.awayTeam
         );
@@ -145,24 +147,28 @@ const Matches: React.FC = () => {
           return null;
         }
 
+        // Calculate match position (index + 1 since indices are zero-based)
         const matchPosition = matchIndex + 1;
         const matchId = matchPosition;
+
+        // Retrieve homeScore and awayScore from currentScores
         const homeScore = currentScores.homeScores[matchId];
         const awayScore = currentScores.awayScores[matchId];
 
+        // Check if at least one score is filled out
         if (!isNaN(homeScore) && !isNaN(awayScore)) {
           atLeastOneScoreFilled = true;
         }
 
         return {
-          match_position: matchPosition,
           match_id: matchId,
           homeScore,
           awayScore,
         };
       })
-      .filter((formDataEntry) => formDataEntry !== null);
+      .filter((formDataEntry) => formDataEntry !== null); // Filter out any null entries
 
+    // If no scores are filled out, show error message and return
     if (!atLeastOneScoreFilled) {
       setUnsuccessfulMessage(
         "Please provide valid scores for at least one match."
@@ -171,6 +177,7 @@ const Matches: React.FC = () => {
     }
 
     try {
+      // Send formData to backend for submission
       const response = await fetch(
         "https://matchpredict-f88c889f1126.herokuapp.com/predictions",
         {
@@ -183,11 +190,13 @@ const Matches: React.FC = () => {
         }
       );
 
+      // Handle response from backend
       if (!response.ok) {
         setUnsuccessfulMessage("Predictions were not saved.");
         throw new Error("Network response was not ok");
       }
 
+      // Update allScores to mark current day as submitted
       const newScores = { ...allScores };
       newScores[currentDay] = { ...currentScores, submitted: true };
       setAllScores(newScores);
