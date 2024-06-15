@@ -151,7 +151,7 @@ const Matches: React.FC = () => {
 
       // Submit scores that are filled out
       return {
-        match_id: matchId,
+        match_id: match.match_Id,
         homeScore,
         awayScore,
       };
