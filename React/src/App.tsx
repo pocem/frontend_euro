@@ -11,6 +11,7 @@ import Navbar from "./components/Navbar.tsx";
 import LoggedUser from "./components/LoggedUser.tsx";
 import HomePage from "./components/HomePage.tsx";
 import useWindowSize from "./components/WindowSize";
+import eurologo from "./images/eurologo.png";
 
 function App() {
   const [showSignUpForm, setShowSignUpForm] = useState(false);
@@ -124,10 +125,7 @@ function App() {
         {isLoggedIn && <LoggedUser loggedInUserName={loggedInUserName} />}
       </div>
       {!isLoggedIn && (
-        <img
-          className="img-fluid euro-logo mt-2 "
-          src="src/images/eurologo.jpg"
-        />
+        <img className="img-fluid euro-logo mt-2 " src={eurologo} />
       )}
     </div>
   );

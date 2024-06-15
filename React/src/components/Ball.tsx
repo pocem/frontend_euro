@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import ballImage from "../images/ball.png";
 
 const Ball: React.FC = () => {
   useEffect(() => {
@@ -50,7 +51,7 @@ const Ball: React.FC = () => {
   return (
     <img
       id="football"
-      src="src/images/ball.png"
+      src={ballImage}
       alt="Football"
       style={{ width: "50px", height: "50px" }}
     />

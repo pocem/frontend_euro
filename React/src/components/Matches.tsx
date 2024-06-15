@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import metaData from "../../matchdata.json";
 import Button from "./Button";
 import MatchRow from "./MatchRow";
@@ -13,17 +13,17 @@ type Match = {
   time: string;
 };
 
+interface DayScores {
+  homeScores: { [matchId: number]: number };
+  awayScores: { [matchId: number]: number };
+  submitted: boolean;
+}
+
 const Matches: React.FC = () => {
   const [currentDay, setCurrentDay] = useState(0);
   const [allScores, setAllScores] = useState<{ [day: number]: DayScores }>({});
   const [successMessage, setSuccessMessage] = useState("");
   const [unsuccessfulMessage, setUnsuccessfulMessage] = useState("");
-
-  interface DayScores {
-    homeScores: { [matchId: number]: number };
-    awayScores: { [matchId: number]: number };
-    submitted: boolean;
-  }
 
   // Transform matches data to the correct Match type with match_id
   const matches: Match[] = metaData.matchesData.map(
@@ -38,7 +38,7 @@ const Matches: React.FC = () => {
 
   // Filter matches based on the current day
   const filteredMatches: Match[] = matches.filter((match: Match) => {
-    const matchDay = parseInt(match.date.split(",")[0]);
+    const matchDay = parseInt(match.date.split(" ")[0]);
     return matchDay === currentDay + 14;
   });
 
@@ -79,7 +79,7 @@ const Matches: React.FC = () => {
             );
 
             if (matchIndex !== -1) {
-              const matchDay = parseInt(matches[matchIndex].date.split(",")[0]);
+              const matchDay = parseInt(matches[matchIndex].date.split(" ")[0]);
               const dayIndex = matchDay - 14;
 
               newAllScores[dayIndex] = newAllScores[dayIndex] || {
@@ -102,7 +102,7 @@ const Matches: React.FC = () => {
     };
 
     fetchSavedPredictions();
-  }, []);
+  }, [matches]);
 
   const handleHomeScoreChange = (matchId: number, score: string) => {
     const newScores = { ...allScores };
