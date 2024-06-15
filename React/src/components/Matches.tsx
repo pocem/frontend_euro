@@ -179,14 +179,17 @@ const Matches: React.FC = () => {
       .filter((formData) => formData !== null);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/predictions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://matchpredict-f88c889f1126.herokuapp.com/predictions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (!response.ok) {
         setUnsuccessfulMessage("Predictions were not saved.");
